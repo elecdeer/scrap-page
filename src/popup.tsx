@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import { useAsync } from "react-use";
+import { action, tabs } from "webextension-polyfill";
 
 const Popup = () => {
   const [count, setCount] = useState(0);
   const [currentURL, setCurrentURL] = useState<string>();
 
-  useEffect(() => {
-    void chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
+  const updateCount = (count: number) => {
+    setCount(count);
+    void action.setBadgeText({ text: count.toString() });
+  };
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
-    });
+  useAsync(async () => {
+    const activeTabs = await tabs.query({ active: true, currentWindow: true });
+    const activeTab = activeTabs[0];
+    setCurrentURL(activeTab.url);
   }, []);
 
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id !== undefined) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
-    });
+  const changeBackground = async () => {
+    const activeTabs = await tabs.query({ active: true, currentWindow: true });
+    const activeTab = activeTabs[0];
+    if (activeTab.id !== undefined) {
+      const res = (await tabs.sendMessage(activeTab.id, {
+        color: "#555555",
+      })) as Promise<string>;
+      console.log("result message:", res);
+    }
   };
 
   return (
@@ -39,7 +36,7 @@ const Popup = () => {
         <li>Current Time: {new Date().toLocaleTimeString()}</li>
       </ul>
       <button
-        onClick={() => setCount(count + 1)}
+        onClick={() => updateCount(count + 1)}
         style={{ marginRight: "5px" }}
       >
         count up

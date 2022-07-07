@@ -1,44 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import { useAsync } from "react-use";
+import { storage } from "webextension-polyfill";
 
 const Options = () => {
   const [color, setColor] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [like, setLike] = useState<boolean>(false);
 
-  useEffect(() => {
-    // Restores select box and checkbox state using the preferences
-    // stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        favoriteColor: "red",
-        likesColor: true,
-      },
-      (items) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        setColor(items.favoriteColor);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        setLike(items.likesColor);
-      }
-    );
+  useAsync(async () => {
+    const value = (await storage.sync.get({
+      favoriteColor: "red",
+      likesColor: true,
+    })) as {
+      favoriteColor: string;
+      likesColor: boolean;
+    };
+
+    setColor(value.favoriteColor);
+    setLike(value.likesColor);
   }, []);
 
-  const saveOptions = () => {
-    // Saves options to chrome.storage.sync.
-    chrome.storage.sync.set(
-      {
-        favoriteColor: color,
-        likesColor: like,
-      },
-      () => {
-        // Update status to let user know options were saved.
-        setStatus("Options saved.");
-        const id = setTimeout(() => {
-          setStatus("");
-        }, 1000);
-        return () => clearTimeout(id);
-      }
-    );
+  const saveOptions = async () => {
+    await storage.sync.set({
+      favoriteColor: color,
+      likesColor: like,
+    });
+
+    setStatus("Options saved.");
+    const id = setTimeout(() => {
+      setStatus("");
+    }, 1000);
+
+    // // Saves options to chrome.storage.sync.
+    // chrome.storage.sync.set(
+    //   {
+    //     favoriteColor: color,
+    //     likesColor: like,
+    //   },
+    //   () => {
+    //     // Update status to let user know options were saved.
+    //     setStatus("Options saved.");
+    //     const id = setTimeout(() => {
+    //       setStatus("");
+    //     }, 1000);
+    //     return () => clearTimeout(id);
+    //   }
+    // );
   };
 
   return (

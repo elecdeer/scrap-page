@@ -1,12 +1,15 @@
-chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+import { runtime } from "webextension-polyfill";
+
+runtime.onMessage.addListener(async (msg, sender) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const color = msg.color as string | undefined;
 
   if (color !== undefined) {
     console.log(`Receive color = ${color}`);
     document.body.style.backgroundColor = color;
-    sendResponse(`Change color to ${color}`);
+
+    return `Change color to ${color}`;
   } else {
-    sendResponse("Color message is none.");
+    return `"Color message is none."`;
   }
 });
