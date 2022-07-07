@@ -1,8 +1,11 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-  if (msg.color) {
-    console.log("Receive color = " + msg.color);
-    document.body.style.backgroundColor = msg.color;
-    sendResponse("Change color to " + msg.color);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const color = msg.color as string | undefined;
+
+  if (color !== undefined) {
+    console.log(`Receive color = ${color}`);
+    document.body.style.backgroundColor = color;
+    sendResponse(`Change color to ${color}`);
   } else {
     sendResponse("Color message is none.");
   }

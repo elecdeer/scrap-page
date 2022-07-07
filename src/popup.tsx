@@ -6,7 +6,7 @@ const Popup = () => {
   const [currentURL, setCurrentURL] = useState<string>();
 
   useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
+    void chrome.action.setBadgeText({ text: count.toString() });
   }, [count]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const Popup = () => {
   const changeBackground = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const tab = tabs[0];
-      if (tab.id) {
+      if (tab.id !== undefined) {
         chrome.tabs.sendMessage(
           tab.id,
           {
