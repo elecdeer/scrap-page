@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { useAsync } from "react-use";
 import { storage } from "webextension-polyfill";
@@ -21,6 +21,7 @@ const Options = () => {
     setLike(value.likesColor);
   }, []);
 
+  const timerId = useRef<number>();
   const saveOptions = async () => {
     await storage.sync.set({
       favoriteColor: color,
@@ -28,25 +29,13 @@ const Options = () => {
     });
 
     setStatus("Options saved.");
-    const id = setTimeout(() => {
-      setStatus("");
-    }, 1000);
 
-    // // Saves options to chrome.storage.sync.
-    // chrome.storage.sync.set(
-    //   {
-    //     favoriteColor: color,
-    //     likesColor: like,
-    //   },
-    //   () => {
-    //     // Update status to let user know options were saved.
-    //     setStatus("Options saved.");
-    //     const id = setTimeout(() => {
-    //       setStatus("");
-    //     }, 1000);
-    //     return () => clearTimeout(id);
-    //   }
-    // );
+    if (timerId.current !== undefined) {
+      window.clearTimeout(timerId.current);
+    }
+    timerId.current = window.setTimeout(() => {
+      setStatus("");
+    }, 3000);
   };
 
   return (
@@ -73,8 +62,8 @@ const Options = () => {
           I like colors.
         </label>
       </div>
-      <div>{status}</div>
       <button onClick={saveOptions}>Save</button>
+      <div>{status}</div>
     </>
   );
 };

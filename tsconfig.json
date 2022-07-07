@@ -3,7 +3,7 @@
     "strict": true,
     "module": "commonjs",
     "target": "ES2021",
-    "lib": ["ES2021", "dom"],
+    "lib": ["dom", "ES2021"],
     "esModuleInterop": true,
     "sourceMap": false,
     "rootDir": "src",
