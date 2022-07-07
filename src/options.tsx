@@ -15,7 +15,9 @@ const Options = () => {
         likesColor: true,
       },
       (items) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         setColor(items.favoriteColor);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         setLike(items.likesColor);
       }
     );
@@ -42,7 +44,8 @@ const Options = () => {
   return (
     <>
       <div>
-        Favorite color: <select
+        Favorite color:{" "}
+        <select
           value={color}
           onChange={(event) => setColor(event.target.value)}
         >
